@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using MoodTrackerAPI.Data;
 
 namespace MoodTrackerAPI
 {
@@ -8,8 +10,11 @@ namespace MoodTrackerAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -26,7 +31,6 @@ namespace MoodTrackerAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
