@@ -5,7 +5,7 @@ namespace MoodTrackerAPI.Models
 {
     public class MoodEntry
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
         public DateTime Date { get; set; }
