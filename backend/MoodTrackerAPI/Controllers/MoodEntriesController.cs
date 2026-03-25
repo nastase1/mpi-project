@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MoodTrackerAPI.Data;
 using MoodTrackerAPI.Models;
+using MoodTrackerAPI.Services;
 
 namespace MoodTrackerAPI.Controllers
 {
@@ -9,59 +8,55 @@ namespace MoodTrackerAPI.Controllers
     [ApiController]
     public class MoodEntriesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly MoodEntryService _service;
 
-        public MoodEntriesController(AppDbContext context)
+        public MoodEntriesController(MoodEntryService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: api/MoodEntries
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MoodEntry>>> GetMoodEntries()
         {
-            return await _context.MoodEntries.ToListAsync();
+            return Ok(await _service.GetAllAsync());
         }
 
         // GET: api/MoodEntries/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<MoodEntry>> GetMoodEntry(Guid id)
         {
-            var moodEntry = await _context.MoodEntries.FindAsync(id);
+            var moodEntry = await _service.GetByIdAsync(id);
 
             if (moodEntry == null)
             {
-                return NotFound(); // 404
+                return NotFound();
             }
 
-            return moodEntry; // 200
+            return Ok(moodEntry);
         }
 
         // POST: api/MoodEntries
         [HttpPost]
         public async Task<ActionResult<MoodEntry>> CreateMoodEntry([FromBody] MoodEntry moodEntry)
         {
-            _context.MoodEntries.Add(moodEntry);
-            await _context.SaveChangesAsync();
+            var created = await _service.CreateAsync(moodEntry);
 
-            return CreatedAtAction(nameof(GetMoodEntry), new { id = moodEntry.Id }, moodEntry); // 201
+            return CreatedAtAction(nameof(GetMoodEntry), new { id = created.Id }, created);
         }
 
         // DELETE: api/MoodEntries/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMoodEntry(Guid id)
         {
-            var moodEntry = await _context.MoodEntries.FindAsync(id);
+            var deleted = await _service.DeleteAsync(id);
 
-            if (moodEntry == null)
+            if (!deleted)
             {
-                return NotFound(); // 404
+                return NotFound();
             }
 
-            _context.MoodEntries.Remove(moodEntry);
-            await _context.SaveChangesAsync();
-
-            return NoContent(); // 204
+            return NoContent();
         }
     }
 }
