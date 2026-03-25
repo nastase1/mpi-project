@@ -40,10 +40,26 @@ namespace MoodTrackerAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<MoodEntry>> CreateMoodEntry([FromBody] MoodEntry moodEntry)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrWhiteSpace(moodEntry.Mood))
+            {
+                return BadRequest("Mood is required.");
+            }
+
+            if (moodEntry.Date > DateTime.UtcNow)
+            {
+                return BadRequest("Date cannot be in the future.");
+            }
+
             var created = await _service.CreateAsync(moodEntry);
 
             return CreatedAtAction(nameof(GetMoodEntry), new { id = created.Id }, created);
         }
+
 
         // DELETE: api/MoodEntries/{id}
         [HttpDelete("{id}")]
