@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Matter from 'matter-js';
 
-// --- CONFIGURARE API ---
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const MOODS = {
@@ -173,7 +172,6 @@ export default function MoodJar() {
     finally { setIsSaving(false); }
   };
 
-  // --- ȘTERGERE REPARATĂ: Trezim restul bilelor ---
   const handleDeleteEntry = async () => {
     if (!selectedEntry) return;
     if (!window.confirm("Sigur vrei să ștergi această bilă?")) return;
@@ -190,10 +188,8 @@ export default function MoodJar() {
         );
 
         if (ballToRemove) {
-          // 1. Ștergem bila
           Matter.Composite.remove(engine.world, ballToRemove);
 
-          // 2. REZOLVARE: Trezim forțat toate bilele rămase ca să simtă gravitația
           const allBalls = Matter.Composite.allBodies(engine.world);
           allBalls.forEach(body => {
             if (!body.isStatic) {
@@ -215,7 +211,6 @@ export default function MoodJar() {
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md mx-auto relative">
 
-      {/* MODAL: ADAUGARE */}
       {draftMood && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setDraftMood(null)}></div>
@@ -237,7 +232,6 @@ export default function MoodJar() {
         </div>
       )}
 
-      {/* MODAL: INSPECTARE & STERGERE */}
       {selectedEntry && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" onClick={closeInspect}></div>
