@@ -146,8 +146,8 @@ export default function History() {
       {/* CALENDAR GRID */}
       <div className="grid grid-cols-7 gap-3 sm:gap-4 relative z-10">
         {/* Zilele Săptămânii */}
-        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(d => (
-          <div key={d} className="text-center text-indigo-900/40 font-black text-xs tracking-widest uppercase mb-2">
+        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, idx) => (
+          <div key={idx} className="text-center text-indigo-900/40 font-black text-xs tracking-widest uppercase mb-2">
             {d}
           </div>
         ))}
