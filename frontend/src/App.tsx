@@ -22,8 +22,6 @@ function App() {
           
           {/* Lumina de accent cald (Galben pastelat) */}
           <div className="absolute top-[20%] left-[50%] w-[30vw] h-[30vw] rounded-full bg-amber-300/10 blur-[100px]" />
-          
-          <div className="absolute inset-0 opacity-[0.015] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
         </div>
 
         <Navbar />
