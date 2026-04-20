@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MoodJar from './components/MoodJar';
 import History from './pages/History'; 
+import Welcome from './pages/Welcome';
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
         
         <main className="max-w-4xl mx-auto px-4 py-8 flex flex-col items-center">
           <Routes>
-            <Route path="/" element={<MoodJar />} />
+            <Route path="/" element={<Welcome />} />
+            <Route path="/jar" element={<MoodJar />} />
             <Route path="/history" element={<History />} />
           </Routes>
         </main>

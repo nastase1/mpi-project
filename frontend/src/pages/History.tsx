@@ -48,7 +48,6 @@ export default function History() {
     fetchHistory();
   }, []);
 
-  // --- FUNCȚIA DE ȘTERGERE ---
   const handleDeleteEntry = async () => {
     if (!inspectEntry) return;
     if (!window.confirm("Sigur vrei să ștergi această înregistrare?")) return;
@@ -59,10 +58,8 @@ export default function History() {
       });
 
       if (response.ok) {
-        // Scoatem elementul din starea locală React
         setEntries(prev => prev.filter(e => e.id !== inspectEntry.id));
         setInspectEntry(null);
-        // Dacă nu mai sunt intrări în acea zi, închidem lista zilei
         if (getEntriesForDay(selectedDay!).length <= 1) {
           setSelectedDay(null);
         }
@@ -98,21 +95,18 @@ export default function History() {
   return (
     <div className="w-full max-w-2xl bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white p-6 sm:p-10 mt-6 relative">
       
-      {/* Navigare Lună */}
       <div className="flex items-center justify-between mb-8">
         <button onClick={() => setCurrentMonthDate(new Date(year, month - 1, 1))} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-full font-bold">&larr;</button>
         <h2 className="text-2xl font-extrabold text-slate-800 capitalize">{currentMonthDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' })}</h2>
         <button onClick={() => setCurrentMonthDate(new Date(year, month + 1, 1))} disabled={new Date(year, month + 1, 1) > new Date()} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-full font-bold disabled:opacity-20">&rarr;</button>
       </div>
 
-      {/* Filtre Mood */}
       <div className="flex justify-center gap-2 mb-8 bg-white/50 p-2 rounded-2xl border border-slate-100">
         {(Object.keys(MOODS) as MoodType[]).map(m => (
           <button key={m} onClick={() => setActiveFilter(activeFilter === m ? null : m)} className={`w-10 h-10 rounded-xl text-xl transition-all ${activeFilter === m ? 'bg-slate-800 scale-110 shadow-lg' : 'opacity-40 hover:opacity-100'}`}>{MOODS[m].emoji}</button>
         ))}
       </div>
 
-      {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-2">
         {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(d => <div key={d} className="text-center text-slate-400 font-bold text-xs">{d}</div>)}
         {daysArray.map(day => {
@@ -136,7 +130,6 @@ export default function History() {
         })}
       </div>
 
-      {/* Modal Lista Zilei */}
       {selectedDay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setSelectedDay(null)}></div>
@@ -156,7 +149,6 @@ export default function History() {
         </div>
       )}
 
-      {/* Modal Inspectare + ȘTERGERE */}
       {inspectEntry && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setInspectEntry(null)}></div>
