@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Matter from 'matter-js';
 
+// --- CONFIGURARE API ---
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const MOODS = {
@@ -14,7 +15,7 @@ const MOODS = {
 type MoodType = keyof typeof MOODS;
 
 interface MoodEntry {
-  id?: string;
+  id: string;
   date: string;
   mood: MoodType;
   note: string;
@@ -36,7 +37,6 @@ export default function MoodJar() {
   const engineRef = useRef(Matter.Engine.create({ enableSleeping: true }));
   const mouseConstraintRef = useRef<Matter.MouseConstraint | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const soundCooldowns = useRef<WeakMap<Matter.Body, number>>(new WeakMap());
 
   const [isLoading, setIsLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
@@ -56,9 +56,7 @@ export default function MoodJar() {
       const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sine';
-      const freq = 300 + Math.random() * 200;
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.5, ctx.currentTime + 0.12);
+      osc.frequency.setValueAtTime(300 + Math.random() * 200, ctx.currentTime);
       gain.gain.setValueAtTime(vol * 0.35, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
       osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.15);
@@ -70,7 +68,8 @@ export default function MoodJar() {
     const engine = engineRef.current;
     
     const render = Matter.Render.create({
-      element: sceneRef.current, engine,
+      element: sceneRef.current,
+      engine,
       options: { width: 320, height: 450, background: 'transparent', wireframes: false, pixelRatio: 1 }
     });
 
@@ -86,14 +85,12 @@ export default function MoodJar() {
       mouse: mouse,
       constraint: { stiffness: 0.2, render: { visible: false } }
     });
-    
     mouseConstraintRef.current = mouseConstraint;
     Matter.Composite.add(engine.world, mouseConstraint);
 
     Matter.Events.on(mouseConstraint, 'mousedown', (event) => {
       const bodies = Matter.Composite.allBodies(engine.world).filter(b => !b.isStatic);
       const clickedBodies = Matter.Query.point(bodies, event.mouse.position);
-      
       if (clickedBodies.length > 0) {
         const clickedBall = clickedBodies[0];
         if (clickedBall.plugin && clickedBall.plugin.data) {
@@ -104,13 +101,8 @@ export default function MoodJar() {
 
     Matter.Events.on(engine, 'collisionStart', (event) => {
       event.pairs.forEach((pair) => {
-        const { bodyA, bodyB } = pair;
-        const speed = Math.max(bodyA.speed, bodyB.speed);
-        const now = Date.now();
-        if (now - (soundCooldowns.current.get(bodyA) ?? 0) > 80 && now - (soundCooldowns.current.get(bodyB) ?? 0) > 80) {
-          playBounce(speed);
-          soundCooldowns.current.set(bodyA, now); soundCooldowns.current.set(bodyB, now);
-        }
+        const speed = Math.max(pair.bodyA.speed, pair.bodyB.speed);
+        if (speed > 1.5) playBounce(speed);
       });
     });
 
@@ -121,62 +113,51 @@ export default function MoodJar() {
     const fetchMoods = async () => {
       try {
         const response = await fetch(API_BASE_URL);
-        if (!response.ok) throw new Error("Eroare server");
-        const data = await response.json();
-        if (data && data.length > 0) {
-           data.forEach((entry: MoodEntry, index: number) => {
-               const normalizedMood = entry.mood.toLowerCase() as MoodType;
-               if(MOODS[normalizedMood]) {
-                   setTimeout(() => addBallPhysically(normalizedMood, entry), index * 120); 
-               }
-           });
+        if (response.ok) {
+          const data = await response.json();
+          data.forEach((entry: MoodEntry, index: number) => {
+             const normalizedMood = entry.mood.toLowerCase() as MoodType;
+             if(MOODS[normalizedMood]) {
+                 setTimeout(() => addBallPhysically(normalizedMood, entry), index * 100); 
+             }
+          });
         }
         setIsLoading(false);
       } catch (error) {
-        setConnectionError(true); setIsLoading(false);
+        setConnectionError(true);
+        setIsLoading(false);
       }
     };
 
     fetchMoods();
 
     return () => {
-      Matter.Render.stop(render); Matter.Runner.stop(runner);
-      Matter.Engine.clear(engine); render.canvas.remove();
+      Matter.Render.stop(render);
+      Matter.Runner.stop(runner);
+      Matter.Engine.clear(engine);
+      render.canvas.remove();
     };
   }, []);
 
   const addBallPhysically = (mood: MoodType, entryData: MoodEntry) => {
-    const engine = engineRef.current;
     const radius = 22;
     const randomX = 160 + (Math.random() * 20 - 10);
     const texture = createEmojiTexture(MOODS[mood].emoji, MOODS[mood].color, radius);
 
     const ball = Matter.Bodies.circle(randomX, -20, radius, {
-      restitution: 0.6, friction: 0.05, density: 0.05, sleepThreshold: 30,
+      restitution: 0.6,
+      friction: 0.05,
+      density: 0.05,
       render: { sprite: { texture, xScale: 1, yScale: 1 } },
       plugin: { data: entryData }
     });
-    Matter.Composite.add(engine.world, ball);
-  };
-
-  const openDraftModal = (mood: MoodType) => {
-    const engine = engineRef.current;
-    const dynamicBodies = Matter.Composite.allBodies(engine.world).filter(b => !b.isStatic);
-    if (dynamicBodies.length > 0 && Math.min(...dynamicBodies.map(b => b.position.y)) < 80) {
-      setIsFull(true); return; 
-    }
-    setDraftMood(mood);
-    setDraftNote("");
+    Matter.Composite.add(engineRef.current.world, ball);
   };
 
   const handleSaveMood = async () => {
     if (!draftMood) return;
     setIsSaving(true);
-    const newEntry: MoodEntry = {
-      date: new Date().toISOString(),
-      mood: draftMood,
-      note: draftNote
-    };
+    const newEntry = { date: new Date().toISOString(), mood: draftMood, note: draftNote };
     try {
       const response = await fetch(API_BASE_URL, {
         method: 'POST',
@@ -188,76 +169,111 @@ export default function MoodJar() {
         addBallPhysically(draftMood, savedEntry);
         setDraftMood(null);
       }
-    } catch (error) {
-       alert("Eroare de conexiune.");
-    } finally {
-      setIsSaving(false);
-    }
+    } catch (error) { alert("Eroare de conexiune."); }
+    finally { setIsSaving(false); }
   };
 
- const closeInspect = () => {
-  setSelectedEntry(null);
-  if (mouseConstraintRef.current) {
-    mouseConstraintRef.current.body = null;
-    mouseConstraintRef.current.mouse.button = -1;
-  }
-};
+  // --- ȘTERGERE REPARATĂ: Trezim restul bilelor ---
+  const handleDeleteEntry = async () => {
+    if (!selectedEntry) return;
+    if (!window.confirm("Sigur vrei să ștergi această bilă?")) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/${selectedEntry.id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        const engine = engineRef.current;
+        const ballToRemove = Matter.Composite.allBodies(engine.world).find(
+          b => b.plugin?.data?.id === selectedEntry.id
+        );
+
+        if (ballToRemove) {
+          // 1. Ștergem bila
+          Matter.Composite.remove(engine.world, ballToRemove);
+
+          // 2. REZOLVARE: Trezim forțat toate bilele rămase ca să simtă gravitația
+          const allBalls = Matter.Composite.allBodies(engine.world);
+          allBalls.forEach(body => {
+            if (!body.isStatic) {
+              Matter.Sleeping.set(body, false);
+            }
+          });
+        }
+        
+        closeInspect();
+      }
+    } catch (error) { alert("Eroare la ștergere."); }
+  };
+
+  const closeInspect = () => {
+    setSelectedEntry(null);
+    if (mouseConstraintRef.current) mouseConstraintRef.current.body = null;
+  };
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md mx-auto relative">
 
+      {/* MODAL: ADAUGARE */}
       {draftMood && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm rounded-3xl" onClick={() => setDraftMood(null)}></div>
-          <div className="bg-white p-6 rounded-3xl shadow-2xl z-10 w-full max-w-sm border border-slate-100 flex flex-col gap-4">
-            <h3 className="font-bold text-slate-800 text-lg">Cum a fost ziua ta?</h3>
-            <textarea 
-              autoFocus
-              className="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-400 focus:outline-none min-h-[100px] text-slate-700"
-              placeholder="Notiță..."
-              value={draftNote}
-              onChange={(e) => setDraftNote(e.target.value)}
-            />
-            <div className="flex gap-2 justify-end">
-              <button onClick={() => setDraftMood(null)} className="px-4 py-2 rounded-xl text-slate-500 font-medium">Anulează</button>
-              <button onClick={handleSaveMood} disabled={isSaving} className="px-6 py-2 rounded-xl bg-indigo-600 text-white font-bold shadow-md disabled:opacity-50">
-                {isSaving ? "Salvare..." : "Adaugă"}
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setDraftMood(null)}></div>
+          <div className="bg-white p-6 rounded-3xl shadow-2xl z-10 w-full max-w-sm border border-slate-100 flex flex-col gap-4 animate-pop-in">
+             <h3 className="font-bold text-slate-800 text-lg">Cum a fost ziua ta?</h3>
+             <textarea 
+               autoFocus
+               className="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-400 focus:outline-none min-h-[120px] text-slate-700"
+               value={draftNote}
+               onChange={(e) => setDraftNote(e.target.value)}
+             />
+             <div className="flex gap-2 justify-end">
+               <button onClick={() => setDraftMood(null)} className="px-4 py-2 rounded-xl text-slate-500 font-medium">Anulează</button>
+               <button onClick={handleSaveMood} disabled={isSaving} className="px-6 py-2 rounded-xl bg-indigo-600 text-white font-bold shadow-md">
+                 {isSaving ? "Salvare..." : "Adaugă"}
+               </button>
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: INSPECTARE & STERGERE */}
+      {selectedEntry && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" onClick={closeInspect}></div>
+          <div className="bg-white p-6 rounded-3xl shadow-2xl z-10 w-full max-w-sm border border-slate-100 flex flex-col gap-3 text-center animate-pop-in">
+            <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center text-4xl shadow-inner border-4 border-white mb-2" style={{ backgroundColor: MOODS[selectedEntry.mood.toLowerCase() as MoodType]?.color }}>
+              {MOODS[selectedEntry.mood.toLowerCase() as MoodType]?.emoji}
+            </div>
+            <h3 className="font-black text-slate-800 text-2xl uppercase tracking-tight">{selectedEntry.mood}</h3>
+            <p className="text-xs text-indigo-500 font-bold bg-indigo-50 px-3 py-1 rounded-full inline-block mx-auto">
+              {new Date(selectedEntry.date).toLocaleString('ro-RO')}
+            </p>
+            <div className="bg-slate-50 p-4 rounded-2xl text-slate-700 text-left border border-slate-100 min-h-[80px]">
+              {selectedEntry.note || <span className="text-slate-400 italic">Fără notiță</span>}
+            </div>
+            
+            <div className="flex gap-2 mt-4">
+              <button onClick={handleDeleteEntry} className="flex-1 py-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold border border-rose-100 active:scale-95 transition-all flex items-center justify-center gap-2">
+                <span>🗑️</span> Șterge
+              </button>
+              <button onClick={closeInspect} className="flex-[2] py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors">
+                Închide
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {selectedEntry && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm rounded-3xl" onClick={closeInspect}></div>
-          <div className="bg-white p-6 rounded-3xl shadow-2xl z-10 w-full max-w-sm border border-slate-100 flex flex-col gap-3 text-center">
-            <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center text-4xl shadow-inner border-4 border-white mb-2" style={{ backgroundColor: MOODS[selectedEntry.mood.toLowerCase() as MoodType]?.color }}>
-              {MOODS[selectedEntry.mood.toLowerCase() as MoodType]?.emoji}
-            </div>
-            <h3 className="font-black text-slate-800 text-2xl uppercase">{selectedEntry.mood}</h3>
-            <p className="text-xs text-indigo-500 font-bold bg-indigo-50 px-3 py-1 rounded-full inline-block mx-auto">
-              {new Date(selectedEntry.date).toLocaleString('ro-RO')}
-            </p>
-            <div className="bg-slate-50 p-4 rounded-2xl text-slate-700 text-left border border-slate-100 min-h-[60px]">
-              {selectedEntry.note || <span className="text-slate-400 italic">Fără notiță</span>}
-            </div>
-            <button onClick={closeInspect} className="mt-4 w-full py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors">
-              Închide
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="h-4 w-full text-center">
-        {connectionError && <span className="text-red-500 font-medium text-sm">⚠️ Eroare de conexiune</span>}
-        {isFull && <span className="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-bold">Borcanul e plin!</span>}
+        {connectionError && <span className="text-red-500 font-medium text-sm animate-pulse">⚠️ Fără conexiune la baza de date</span>}
+        {isFull && <span className="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-bold animate-bounce">Borcanul este plin!</span>}
       </div>
 
-      <div className={`relative w-[320px] h-[450px] cursor-pointer ${draftMood || selectedEntry ? 'pointer-events-none' : ''}`}>
+      <div className={`relative w-[320px] h-[450px] cursor-pointer ${draftMood || selectedEntry ? 'pointer-events-none opacity-40' : ''}`}>
         <div ref={sceneRef} className="absolute inset-0 z-10" />
         <div className="absolute inset-0 z-20 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-6 bg-white/10 backdrop-blur-[2px] border-2 border-white/40 rounded-t-md z-20 shadow-sm" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-6 bg-white/10 backdrop-blur-[2px] border-2 border-white/40 rounded-t-md z-20" />
           <div className="absolute top-5 left-0 w-full h-[425px] bg-white/10 backdrop-blur-[2px] border-[3px] border-white/50 rounded-3xl rounded-b-[40px] shadow-[inset_0_-10px_20px_rgba(255,255,255,0.2)] overflow-hidden">
             <div className="absolute top-0 left-4 w-6 h-full bg-gradient-to-r from-white/40 to-transparent -skew-x-[10deg] mix-blend-overlay" />
           </div>
@@ -268,7 +284,14 @@ export default function MoodJar() {
         {(Object.keys(MOODS) as MoodType[]).map((moodKey) => (
           <button
             key={moodKey}
-            onClick={() => openDraftModal(moodKey)}
+            onClick={() => {
+              const dynamicBodies = Matter.Composite.allBodies(engineRef.current.world).filter(b => !b.isStatic);
+              if (dynamicBodies.length > 0 && Math.min(...dynamicBodies.map(b => b.position.y)) < 80) {
+                setIsFull(true); return; 
+              }
+              setDraftMood(moodKey);
+              setDraftNote("");
+            }}
             disabled={isLoading || connectionError || isFull}
             className="flex flex-col items-center gap-3 group outline-none disabled:opacity-50"
           >
