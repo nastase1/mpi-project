@@ -90,77 +90,184 @@ export default function History() {
 
   const formatTime = (dateString: string) => new Date(dateString).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
 
-  if (loading) return <div className="text-indigo-500 font-bold mt-10 text-center">Se încarcă...</div>;
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center mt-20 gap-4">
+      <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+      <div className="text-indigo-600 font-bold animate-pulse">Se încarcă istoricul...</div>
+    </div>
+  );
 
   return (
-    <div className="w-full max-w-2xl bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white p-6 sm:p-10 mt-6 relative">
+    <div className="w-full max-w-2xl bg-white/60 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white/60 p-6 sm:p-10 mt-6 relative overflow-hidden">
       
-      <div className="flex items-center justify-between mb-8">
-        <button onClick={() => setCurrentMonthDate(new Date(year, month - 1, 1))} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-full font-bold">&larr;</button>
-        <h2 className="text-2xl font-extrabold text-slate-800 capitalize">{currentMonthDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' })}</h2>
-        <button onClick={() => setCurrentMonthDate(new Date(year, month + 1, 1))} disabled={new Date(year, month + 1, 1) > new Date()} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-full font-bold disabled:opacity-20">&rarr;</button>
+      {/* Glow ambiental intern */}
+      <div className="absolute -top-24 -right-24 w-64 h-64 bg-violet-400/20 blur-[80px] rounded-full pointer-events-none" />
+
+      {/* HEADER NAVIGARE */}
+      <div className="flex items-center justify-between mb-8 relative z-10">
+        <button 
+          onClick={() => setCurrentMonthDate(new Date(year, month - 1, 1))} 
+          className="w-12 h-12 flex items-center justify-center bg-white/80 hover:bg-white text-indigo-600 rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-105 active:scale-95 border border-white"
+        >
+          &larr;
+        </button>
+        
+        <h2 className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-indigo-600 via-violet-500 to-purple-500 bg-clip-text text-transparent capitalize tracking-tight drop-shadow-sm">
+          {currentMonthDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' })}
+        </h2>
+        
+        <button 
+          onClick={() => setCurrentMonthDate(new Date(year, month + 1, 1))} 
+          disabled={new Date(year, month + 1, 1) > new Date()} 
+          className="w-12 h-12 flex items-center justify-center bg-white/80 hover:bg-white text-indigo-600 rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-105 active:scale-95 border border-white disabled:opacity-30 disabled:hover:scale-100 disabled:shadow-none"
+        >
+          &rarr;
+        </button>
       </div>
 
-      <div className="flex justify-center gap-2 mb-8 bg-white/50 p-2 rounded-2xl border border-slate-100">
+      {/* FILTRE (Dock iOS style) */}
+      <div className="flex justify-center gap-3 mb-10 bg-white/40 backdrop-blur-md p-3 rounded-3xl border border-white/60 shadow-inner max-w-fit mx-auto relative z-10">
         {(Object.keys(MOODS) as MoodType[]).map(m => (
-          <button key={m} onClick={() => setActiveFilter(activeFilter === m ? null : m)} className={`w-10 h-10 rounded-xl text-xl transition-all ${activeFilter === m ? 'bg-slate-800 scale-110 shadow-lg' : 'opacity-40 hover:opacity-100'}`}>{MOODS[m].emoji}</button>
+          <button 
+            key={m} 
+            onClick={() => setActiveFilter(activeFilter === m ? null : m)} 
+            className={`w-12 h-12 rounded-2xl text-2xl flex items-center justify-center transition-all duration-300 ease-out ${
+              activeFilter === m 
+                ? 'bg-white shadow-[0_10px_20px_rgba(0,0,0,0.1)] border border-indigo-100 scale-110 -translate-y-1' 
+                : 'opacity-50 hover:opacity-100 hover:bg-white/50 hover:scale-105'
+            }`}
+            title={MOODS[m].label}
+          >
+            {MOODS[m].emoji}
+          </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-2">
-        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(d => <div key={d} className="text-center text-slate-400 font-bold text-xs">{d}</div>)}
+      {/* CALENDAR GRID */}
+      <div className="grid grid-cols-7 gap-3 sm:gap-4 relative z-10">
+        {/* Zilele Săptămânii */}
+        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(d => (
+          <div key={d} className="text-center text-indigo-900/40 font-black text-xs tracking-widest uppercase mb-2">
+            {d}
+          </div>
+        ))}
+        
+        {/* Căsuțele Zilelor */}
         {daysArray.map(day => {
           const dayEntries = getEntriesForDay(day);
           const hasEntries = dayEntries.length > 0;
           const matches = activeFilter ? dayEntries.some(e => e.mood.toLowerCase() === activeFilter) : true;
           const dominant = getDominantMood(dayEntries);
-          const heatColor = hasEntries && matches && dominant ? MOODS[dominant].color + '33' : '';
+          
+          // Culoare heatmap + transparență
+          const heatColor = hasEntries && matches && dominant ? MOODS[dominant].color + '40' : ''; // 40 e hex ptr ~25% opacitate
 
           return (
             <div 
               key={day} 
               onClick={() => hasEntries && matches && setSelectedDay(day)}
               style={{ backgroundColor: heatColor }}
-              className={`aspect-square rounded-xl flex flex-col items-center justify-center transition-all ${hasEntries && matches ? 'cursor-pointer hover:scale-105 border-2 border-transparent hover:border-indigo-200' : 'bg-slate-50 opacity-30 grayscale'}`}
+              className={`aspect-square rounded-2xl flex flex-col items-center justify-center transition-all duration-300 backdrop-blur-sm border border-white/50 relative group
+                ${hasEntries && matches 
+                  ? 'cursor-pointer hover:scale-110 hover:shadow-[0_10px_25px_rgba(0,0,0,0.1)] hover:z-10 hover:border-white' 
+                  : 'bg-white/30 opacity-40 grayscale'}
+              `}
             >
-              <span className="text-sm font-bold">{day}</span>
-              {hasEntries && matches && <div className="text-[10px]">{MOODS[dominant!].emoji}</div>}
+              <span className={`text-sm font-bold z-10 ${hasEntries && matches ? 'text-slate-800' : 'text-slate-400'}`}>
+                {day}
+              </span>
+              {hasEntries && matches && (
+                <div className="absolute bottom-1 text-[10px] drop-shadow-md transition-transform group-hover:-translate-y-1">
+                  {MOODS[dominant!].emoji}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
+      {/* MODAL: LISTA ZILEI */}
       {selectedDay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setSelectedDay(null)}></div>
-          <div className="bg-white p-6 rounded-3xl shadow-2xl z-10 w-full max-w-sm flex flex-col gap-3">
-            <h3 className="font-bold text-center border-b pb-3">Stări din {selectedDay} {currentMonthDate.toLocaleString('ro-RO', { month: 'long' })}</h3>
-            <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
+          <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" onClick={() => setSelectedDay(null)}></div>
+          <div className="bg-white/95 backdrop-blur-xl p-6 rounded-[2rem] shadow-2xl z-10 w-full max-w-sm flex flex-col gap-4 border border-white animate-pop-in">
+            <h3 className="font-black text-center text-xl text-slate-800 border-b border-slate-100 pb-4 tracking-tight">
+              {selectedDay} {currentMonthDate.toLocaleString('ro-RO', { month: 'long' })}
+            </h3>
+            
+            <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
               {getEntriesForDay(selectedDay).filter(e => !activeFilter || e.mood.toLowerCase() === activeFilter).map(entry => (
-                <button key={entry.id} onClick={() => setInspectEntry(entry)} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all text-left">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm" style={{ backgroundColor: MOODS[entry.mood.toLowerCase() as MoodType].color }}>{MOODS[entry.mood.toLowerCase() as MoodType].emoji}</div>
-                  <div className="flex-1 font-bold text-slate-700 capitalize">{entry.mood} <span className="block text-xs text-indigo-400 font-normal">{formatTime(entry.date)}</span></div>
-                  <span className="text-slate-300">›</span>
+                <button 
+                  key={entry.id} 
+                  onClick={() => setInspectEntry(entry)} 
+                  className="group flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl hover:bg-indigo-50 hover:border-indigo-100 hover:shadow-md transition-all hover:translate-x-1 text-left"
+                >
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-2xl shadow-inner border-2 border-white" 
+                    style={{ backgroundColor: MOODS[entry.mood.toLowerCase() as MoodType].color }}
+                  >
+                    {MOODS[entry.mood.toLowerCase() as MoodType].emoji}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-extrabold text-slate-700 capitalize text-lg leading-none">{entry.mood}</div>
+                    <div className="text-xs text-indigo-400 font-bold mt-1">{formatTime(entry.date)}</div>
+                  </div>
+                  <span className="text-slate-300 font-bold text-xl group-hover:text-indigo-400 transition-colors">›</span>
                 </button>
               ))}
             </div>
-            <button onClick={() => setSelectedDay(null)} className="w-full py-3 rounded-xl bg-slate-100 font-bold text-slate-500">Închide</button>
+            
+            <button onClick={() => setSelectedDay(null)} className="w-full py-4 rounded-xl bg-slate-50 hover:bg-slate-100 font-bold text-slate-500 transition-colors active:scale-95">
+              Înapoi la Calendar
+            </button>
           </div>
         </div>
       )}
 
+      {/* MODAL: INSPECȚIE DETALIATĂ + ȘTERGERE */}
       {inspectEntry && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setInspectEntry(null)}></div>
-          <div className="bg-white p-6 rounded-3xl shadow-2xl z-10 w-full max-w-sm text-center animate-pop-in">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner" style={{ backgroundColor: MOODS[inspectEntry.mood.toLowerCase() as MoodType].color }}>{MOODS[inspectEntry.mood.toLowerCase() as MoodType].emoji}</div>
-            <h3 className="text-3xl font-black uppercase mb-1">{inspectEntry.mood}</h3>
-            <p className="text-xs font-bold text-indigo-500 mb-4">{new Date(inspectEntry.date).toLocaleString('ro-RO')}</p>
-            <div className="bg-slate-50 p-4 rounded-2xl text-left border mb-6 italic text-slate-600">"{inspectEntry.note || 'Fără notiță'}"</div>
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setInspectEntry(null)}></div>
+          <div className="bg-white/95 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl z-10 w-full max-w-sm text-center border border-white animate-pop-in relative overflow-hidden">
             
-            <div className="flex gap-2">
-              <button onClick={handleDeleteEntry} className="flex-1 py-3 bg-rose-50 text-rose-600 rounded-xl font-bold border border-rose-100 hover:bg-rose-100 transition-all">🗑️ Șterge</button>
-              <button onClick={() => setInspectEntry(null)} className="flex-[2] py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-md">Închide</button>
+            {/* Glow efect in spatele emoji-ului */}
+            <div 
+              className="absolute top-10 left-1/2 -translate-x-1/2 w-32 h-32 blur-[40px] opacity-30 rounded-full pointer-events-none"
+              style={{ backgroundColor: MOODS[inspectEntry.mood.toLowerCase() as MoodType].color }}
+            />
+
+            <div 
+              className="relative w-24 h-24 rounded-full flex items-center justify-center text-6xl mx-auto mb-4 shadow-inner border-4 border-white transform hover:rotate-12 transition-transform" 
+              style={{ backgroundColor: MOODS[inspectEntry.mood.toLowerCase() as MoodType].color }}
+            >
+              {MOODS[inspectEntry.mood.toLowerCase() as MoodType].emoji}
+            </div>
+            
+            <h3 className="text-3xl font-black uppercase tracking-tight text-slate-800">{inspectEntry.mood}</h3>
+            <p className="text-sm font-bold text-indigo-500 mb-6 mt-1 bg-indigo-50 inline-block px-4 py-1 rounded-full">
+              {new Date(inspectEntry.date).toLocaleString('ro-RO')}
+            </p>
+            
+            <div className="bg-white p-5 rounded-2xl text-left border border-slate-100 shadow-inner mb-8 relative">
+              <span className="absolute -top-3 left-4 bg-white px-2 text-[10px] font-black text-slate-300 uppercase tracking-widest">Notiță</span>
+              <p className="italic text-slate-600 font-medium text-lg leading-relaxed">
+                {inspectEntry.note ? `"${inspectEntry.note}"` : <span className="text-slate-400">Fără notiță adăugată.</span>}
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={handleDeleteEntry} 
+                className="flex-1 py-4 bg-rose-50 text-rose-600 rounded-2xl font-bold border border-rose-100 hover:bg-rose-100 hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                <span>🗑️</span>
+              </button>
+              <button 
+                onClick={() => setInspectEntry(null)} 
+                className="flex-[3] py-4 bg-gradient-to-r from-indigo-600 to-violet-500 text-white rounded-2xl font-bold shadow-lg shadow-indigo-200 hover:-translate-y-0.5 active:scale-95 transition-all"
+              >
+                Închide
+              </button>
             </div>
           </div>
         </div>
