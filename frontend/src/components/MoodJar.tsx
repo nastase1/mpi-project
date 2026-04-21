@@ -159,7 +159,10 @@ export default function MoodJar() {
   const handleSaveMood = async () => {
     if (!draftMood) return;
     setIsSaving(true);
-    const newEntry = { date: new Date().toISOString(), mood: draftMood, note: draftNote };
+    // Subtract 5 seconds to avoid "date in future" validation error
+    const date = new Date();
+    date.setSeconds(date.getSeconds() - 5);
+    const newEntry = { date: date.toISOString(), mood: draftMood, note: draftNote || "" };
     try {
       const response = await fetch(API_BASE_URL, {
         method: 'POST',
@@ -209,7 +212,7 @@ export default function MoodJar() {
   const closeInspect = () => {
     setSelectedEntry(null);
     if (mouseConstraintRef.current) {
-      mouseConstraintRef.current.body = null;
+      mouseConstraintRef.current.body = undefined as any;
       mouseConstraintRef.current.mouse.button = -1;
     }
   };
