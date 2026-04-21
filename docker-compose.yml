@@ -1,24 +1,24 @@
 services:
-  # SQL Server Database
+  # PostgreSQL Database
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: postgres:16-alpine
     container_name: moodtracker-db
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong@Password123
-      - MSSQL_PID=Express
+      - POSTGRES_USER=moodtracker_user
+      - POSTGRES_PASSWORD=YourStrong@Password123
+      - POSTGRES_DB=MoodTrackerDb
     ports:
-      - "1433:1433"
+      - "5432:5432"
     volumes:
-      - moodtracker-data:/var/opt/mssql
+      - moodtracker-data:/var/lib/postgresql/data
     networks:
       - moodtracker-network
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong@Password123 -Q 'SELECT 1' -C || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+      test: ["CMD-SHELL", "pg_isready -U moodtracker_user -d MoodTrackerDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Backend API
   backend:
@@ -29,7 +29,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Server=db;Database=MoodTrackerDb;User Id=sa;Password=YourStrong@Password123;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Host=db;Database=MoodTrackerDb;Username=moodtracker_user;Password=YourStrong@Password123;
     ports:
       - "5162:8080"
     depends_on:
