@@ -2,7 +2,7 @@ name: CD - Continuous Deployment
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch: # Allow manual triggering
 
 env:
@@ -17,11 +17,11 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     outputs:
       backend_tag: ${{ steps.meta-backend.outputs.tags }}
       frontend_tag: ${{ steps.meta-frontend.outputs.tags }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -88,17 +88,46 @@ jobs:
     environment:
       name: production
       url: ${{ steps.deploy.outputs.url }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Option 1: Deploy to Render
-      # Uncomment and configure when ready to deploy
-      # - name: Deploy to Render
-      #   run: |
-      #     curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
-      #     echo "Deployed to Render"
+      # Deploy Backend to Render
+      - name: Deploy Backend to Render
+        if: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK != '' }}
+        run: |
+          echo "🚀 Deploying backend to Render..."
+          response=$(curl -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}" -w "\n%{http_code}")
+          http_code=$(echo "$response" | tail -n1)
+          if [ "$http_code" = "200" ] || [ "$http_code" = "201" ]; then
+            echo "✅ Backend deployment triggered successfully"
+          else
+            echo "❌ Backend deployment failed with HTTP $http_code"
+            exit 1
+          fi
+
+      # Deploy Frontend to Render
+      - name: Deploy Frontend to Render
+        if: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK != '' }}
+        run: |
+          echo "🚀 Deploying frontend to Render..."
+          response=$(curl -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}" -w "\n%{http_code}")
+          http_code=$(echo "$response" | tail -n1)
+          if [ "$http_code" = "200" ] || [ "$http_code" = "201" ]; then
+            echo "✅ Frontend deployment triggered successfully"
+          else
+            echo "❌ Frontend deployment failed with HTTP $http_code"
+            exit 1
+          fi
+
+      # Wait for deployments to complete
+      - name: Wait for Render deployments
+        if: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK != '' }}
+        run: |
+          echo "⏳ Waiting 60 seconds for Render services to deploy..."
+          sleep 60
+          echo "✅ Deployment window complete"
 
       # Option 2: Deploy to Railway
       # Uncomment and configure when ready to deploy
@@ -143,7 +172,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-and-push, deploy]
     if: always()
-    
+
     steps:
       - name: Deployment Summary
         run: |
@@ -154,7 +183,7 @@ jobs:
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Author:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ needs.deploy.result }}" == "success" ]; then
             echo "✅ Deployment completed successfully!" >> $GITHUB_STEP_SUMMARY
           else

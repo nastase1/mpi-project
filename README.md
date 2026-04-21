@@ -203,6 +203,7 @@ Proiectul utilizează **GitHub Actions** pentru automatizarea build-ului, testă
 **Trigger:** Orice Pull Request către `main` sau `develop`
 
 **Ce face:**
+
 - ✅ Rulează teste backend (.NET unit tests)
 - ✅ Verifică build-ul frontend (linting + compile)
 - ✅ Validează Docker images (build test)
@@ -216,6 +217,7 @@ Proiectul utilizează **GitHub Actions** pentru automatizarea build-ului, testă
 **Trigger:** Merge pe branch-ul `main`
 
 **Ce face:**
+
 - 📦 Build Docker images pentru backend și frontend
 - 🚀 Push images la GitHub Container Registry
 - ☁️ Deploy automat în cloud (production)
@@ -224,18 +226,38 @@ Proiectul utilizează **GitHub Actions** pentru automatizarea build-ului, testă
 ### Pentru Dezvoltatori
 
 **Înainte de a crea un PR:**
+
 1. Asigură-te că aplicația pornește local: `docker compose up`
 2. Rulează testele: `cd backend/MoodTrackerAPI.Tests && dotnet test`
 3. Verifică că frontend se compilează: `cd frontend && npm run build`
 
 **După ce creezi PR-ul:**
+
 - CI va rula automat toate testele
 - Așteaptă ca toate check-urile să devină verzi ✅
 - Cere code review de la colegi
 - Merge doar după aprobarea review-ului
 
 **Documentație completă:** [.github/CICD.md](.github/CICD.md)
+### ☁️ Cloud Deployment
 
+Aplicația este configurată pentru deployment automat pe **Render.com** la fiecare merge pe `main`.
+
+**Servicii deployed:**
+- Backend API (ASP.NET Core + PostgreSQL)
+- Frontend (React + Nginx)
+- Database (PostgreSQL managed)
+
+**Deployment Guides:**
+- 📘 **[Step-by-Step Render.com Deployment](.github/RENDER_DEPLOYMENT_GUIDE.md)** - Ghid complet cu capturi de ecran
+- 📋 **[Quick Reference Card](RENDER_QUICK_REFERENCE.md)** - Comenzi și URLs rapid access
+- 🔧 **Helper Scripts:**
+  - `scripts/update-cors.ps1` - Update CORS settings (PowerShell)
+  - `scripts/update-cors.sh` - Update CORS settings (Bash)
+
+**Production URLs** *(după deployment)*:
+- Frontend: `https://moodtracker-frontend.onrender.com`
+- Backend API: `https://moodtracker-backend.onrender.com/api/MoodEntries`
 ## �🔧 Configurare Environment Variables
 
 ### Backend (.env)
