@@ -13,8 +13,12 @@ namespace MoodTrackerAPI
             // Add services to the container.
             builder.Services.AddControllers();
 
+            // Get connection string - Render uses DATABASE_URL, local uses DefaultConnection
+            var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
+                ?? builder.Configuration.GetConnectionString("DefaultConnection");
+            
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(connectionString));
             builder.Services.AddScoped<MoodEntryService>();
 
             builder.Services.AddCors(options =>
@@ -41,8 +45,17 @@ namespace MoodTrackerAPI
             // Auto-migrate database on startup
             using (var scope = app.Services.CreateScope())
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                dbContext.Database.Migrate();
+                try
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    dbContext.Database.Migrate();
+                    Console.WriteLine("Database migration completed successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error during database migration: {ex.Message}");
+                    // Don't crash the app, let it try to start anyway
+                }
             }
 
             // Configure the HTTP request pipeline.
