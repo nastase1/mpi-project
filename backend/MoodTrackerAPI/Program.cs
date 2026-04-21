@@ -10,13 +10,21 @@ namespace MoodTrackerAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Configure logging
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
+
             // Add services to the container.
             builder.Services.AddControllers();
 
+            var logger = LoggerFactory.Create(config => config.AddConsole()).CreateLogger<Program>();
+
             // Get connection string - Render uses DATABASE_URL, local uses DefaultConnection
-            var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
+            var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
                 ?? builder.Configuration.GetConnectionString("DefaultConnection");
-            
+
             // Convert Render's PostgreSQL URL format to Npgsql connection string format
             if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
             {
@@ -24,21 +32,21 @@ namespace MoodTrackerAPI
                 var port = uri.Port > 0 ? uri.Port : 5432; // Default PostgreSQL port
                 var userInfo = uri.UserInfo.Split(':');
                 connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-                Console.WriteLine("Converted DATABASE_URL from postgres:// format to Npgsql format");
+                logger.LogInformation("[STARTUP] Converted DATABASE_URL from postgres:// format to Npgsql format");
             }
-            
-            // Debug: Log connection string status (without exposing password)
+
+            // Log connection string status (without exposing password)
             if (string.IsNullOrEmpty(connectionString))
             {
-                Console.WriteLine("ERROR: Connection string is null or empty!");
-                Console.WriteLine($"DATABASE_URL env var: {(Environment.GetEnvironmentVariable("DATABASE_URL") != null ? "SET" : "NOT SET")}");
-                Console.WriteLine($"DefaultConnection config: {(builder.Configuration.GetConnectionString("DefaultConnection") != null ? "SET" : "NOT SET")}");
+                logger.LogError("[STARTUP] Connection string is null or empty!");
+                logger.LogWarning("[STARTUP] DATABASE_URL env var: {Status}", Environment.GetEnvironmentVariable("DATABASE_URL") != null ? "SET" : "NOT SET");
+                logger.LogWarning("[STARTUP] DefaultConnection config: {Status}", builder.Configuration.GetConnectionString("DefaultConnection") != null ? "SET" : "NOT SET");
             }
             else
             {
-                Console.WriteLine($"Connection string loaded successfully (length: {connectionString.Length})");
+                logger.LogInformation("[STARTUP] Connection string loaded successfully (length: {Length})", connectionString.Length);
             }
-            
+
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
             builder.Services.AddScoped<MoodEntryService>();
@@ -67,15 +75,17 @@ namespace MoodTrackerAPI
             // Auto-migrate database on startup
             using (var scope = app.Services.CreateScope())
             {
+                var scopeLogger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                 try
                 {
+                    scopeLogger.LogInformation("[DATABASE] Starting database migration...");
                     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     dbContext.Database.Migrate();
-                    Console.WriteLine("Database migration completed successfully.");
+                    scopeLogger.LogInformation("[DATABASE] Migration completed successfully");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error during database migration: {ex.Message}");
+                    scopeLogger.LogError(ex, "[DATABASE] Error during migration: {ErrorMessage}", ex.Message);
                     // Don't crash the app, let it try to start anyway
                 }
             }

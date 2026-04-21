@@ -258,22 +258,44 @@ Aplicația este configurată pentru deployment automat pe **Render.com** la fiec
 **Production URLs** *(după deployment)*:
 - Frontend: `https://moodtracker-frontend.onrender.com`
 - Backend API: `https://moodtracker-backend.onrender.com/api/MoodEntries`
-## �🔧 Configurare Environment Variables
 
-### Backend (.env)
+## 🔧 Configurare Environment Variables
+
+### Local Development
+
+#### Backend (.env)
 
 ```env
-ConnectionStrings__DefaultConnection=Server=localhost;Database=MoodTrackerDb;Trusted_Connection=True;
+ConnectionStrings__DefaultConnection=Host=localhost;Port=5432;Database=MoodTrackerDb;Username=moodtracker_user;Password=YourStrong@Password123;
 ASPNETCORE_ENVIRONMENT=Development
 ```
 
-### Frontend (.env)
+#### Frontend (.env)
 
 ```env
 VITE_API_URL=http://localhost:5162/api/MoodEntries
 ```
 
-**⚠️ Important:** Nu commitați fișierele `.env` în Git! Folosiți `.env.example` ca template.
+### Production (Render.com)
+
+#### Backend Environment Variables
+
+| Variable | Value | Description |
+|----------|-------|-------------|
+| `DATABASE_URL` | *(Auto-set by Render PostgreSQL)* | PostgreSQL connection string |
+| `ASPNETCORE_ENVIRONMENT` | `Production` | Runtime environment |
+| `ASPNETCORE_URLS` | `http://0.0.0.0:8080` | Port binding for Render |
+
+#### Frontend Environment Variables
+
+| Variable | Value | Description |
+|----------|-------|-------------|
+| `VITE_API_URL` | `https://moodtracker-backend-2fk4.onrender.com/api/MoodEntries` | Production backend URL |
+
+**⚠️ Important:** 
+- Nu commitați fișierele `.env` în Git! Folosiți `.env.example` ca template.
+- Render citește automat `DATABASE_URL` pentru conexiunea PostgreSQL
+- Backend convertește automat formatul URL PostgreSQL (`postgresql://...`) la format Npgsql
 
 ## 📦 Build pentru Producție
 
@@ -313,7 +335,67 @@ npm run build
 - ✅ SQL injection protection via EF Core
 - ✅ HTTPS redirect în producție
 
-## 🐛 Troubleshooting
+## � Monitoring & Logging
+
+### Application Logging
+
+Backend-ul utilizează **structured logging** cu `ILogger<T>`:
+
+```csharp
+// Log levels: Information, Warning, Error
+logger.LogInformation("[STARTUP] Application started");
+logger.LogWarning("[DATABASE] Connection retry attempt {Attempt}", retryCount);
+logger.LogError(ex, "[API] Request failed: {ErrorMessage}", ex.Message);
+```
+
+**Log format:**
+- `[STARTUP]` - Application initialization
+- `[DATABASE]` - Database operations (migrations, connections)
+- `[API]` - HTTP requests and responses
+
+### Production Monitoring (Render.com)
+
+#### Metrics Dashboard
+Render oferă monitoring built-in:
+- **CPU Usage** - Utilizare procesor (target: <70%)
+- **Memory Usage** - Utilizare RAM (target: <80% din 512MB)
+- **Response Time** - Latență HTTP (target: <500ms)
+- **Status Checks** - Health endpoint polling
+
+#### Access Logs
+```bash
+# View real-time logs în Render dashboard
+# Logs → Select Service → View Logs
+
+# Căutare keywords
+[STARTUP] - Application boot
+[DATABASE] - Database issues
+[ERROR] - Application errors
+```
+
+#### Health Checks
+
+Backend expune endpoint de health check:
+```bash
+# Local
+curl http://localhost:5162/api/MoodEntries
+
+# Production
+curl https://moodtracker-backend-2fk4.onrender.com/api/MoodEntries
+```
+
+**Expected response:** `200 OK` cu array JSON (poate fi gol: `[]`)
+
+#### Alerting
+
+Render detectează automat:
+- ❌ Crash-uri (exit code != 0)
+- ❌ Health check failures (5 consecutive fails)
+- ❌ OOM (Out of Memory) kills
+
+**Auto-recovery:** Render reporneşte automat serviciul după crash.
+
+## �🐛 Troubleshooting
 
 ### Docker
 
@@ -349,6 +431,62 @@ docker compose logs db
 
 - Verifică că backend rulează pe portul 5162
 - Verifică `.env` file în frontend
+
+### Production (Render.com)
+
+**Problema:** Database migration failed
+
+```bash
+# Symptom: "Format of the initialization string does not conform to specification"
+# Solution: Backend now auto-converts postgresql:// URL to Npgsql format
+# Check logs for: "[STARTUP] Converted DATABASE_URL from postgres:// format"
+```
+
+**Problema:** Application crashes on startup
+
+```bash
+# Check Render logs for:
+# 1. [DATABASE] Connection string issues
+# 2. [STARTUP] Missing environment variables
+# 3. Migration errors
+
+# Common fixes:
+# - Verify DATABASE_URL is set in Render dashboard
+# - Ensure PostgreSQL service is running
+# - Check database connection limits
+```
+
+**Problema:** CORS errors în frontend
+
+```bash
+# Symptom: "Access-Control-Allow-Origin" error
+# Solution: Verifică că frontend URL e în lista CORS din backend:
+# - http://localhost:5173 (local)
+# - https://moodtracker-frontend-jbfn.onrender.com (production)
+```
+
+**Problema:** 502 Bad Gateway
+
+```bash
+# Causes:
+# 1. Backend takes >30s to start (free tier cold start)
+# 2. Port mismatch - trebuie să fie 8080 pentru Render
+# 3. Application crashed - check logs
+
+# Solution:
+# - Wait 30-60s after deployment
+# - Verify ASPNETCORE_URLS=http://0.0.0.0:8080
+# - Check recent commits for breaking changes
+```
+
+**Problema:** GitGuardian security alert
+
+```bash
+# Alert: ODBC Connection String detected
+# Note: Credentials în docker-compose.yml sunt doar pentru LOCAL development
+# Production folosește DATABASE_URL (securizat în Render)
+# Safe to ignore for university projects
+```
 
 ## 📝 Git Workflow
 
