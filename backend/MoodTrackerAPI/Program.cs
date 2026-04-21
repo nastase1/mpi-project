@@ -22,9 +22,13 @@ namespace MoodTrackerAPI
                 options.AddPolicy("AllowReactApp",
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+                        policy.WithOrigins(
+                            "http://localhost:5173", 
+                            "http://localhost:3000",
+                            "https://moodtracker-frontend-jbfn.onrender.com")
                               .AllowAnyHeader()
                               .AllowAnyMethod();
+                        
                     });
             });
 

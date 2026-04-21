@@ -43,5 +43,5 @@ Write-Host "Frontend URL added: $FrontendUrl" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "1. Review changes: git diff $programPath" -ForegroundColor White
-Write-Host "2. Commit: git add $programPath && git commit -m 'feat: add Render frontend to CORS'" -ForegroundColor White
+Write-Host "2. Commit: git add $programPath; git commit -m 'feat: add Render frontend to CORS'" -ForegroundColor White
 Write-Host "3. Push: git push" -ForegroundColor White
