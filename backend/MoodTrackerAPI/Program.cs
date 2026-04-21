@@ -17,6 +17,18 @@ namespace MoodTrackerAPI
             var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
                 ?? builder.Configuration.GetConnectionString("DefaultConnection");
             
+            // Debug: Log connection string status (without exposing password)
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                Console.WriteLine("ERROR: Connection string is null or empty!");
+                Console.WriteLine($"DATABASE_URL env var: {(Environment.GetEnvironmentVariable("DATABASE_URL") != null ? "SET" : "NOT SET")}");
+                Console.WriteLine($"DefaultConnection config: {(builder.Configuration.GetConnectionString("DefaultConnection") != null ? "SET" : "NOT SET")}");
+            }
+            else
+            {
+                Console.WriteLine($"Connection string loaded successfully (length: {connectionString.Length})");
+            }
+            
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
             builder.Services.AddScoped<MoodEntryService>();
