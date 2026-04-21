@@ -29,7 +29,7 @@ namespace MoodTrackerAPI.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Mood")
                         .IsRequired()

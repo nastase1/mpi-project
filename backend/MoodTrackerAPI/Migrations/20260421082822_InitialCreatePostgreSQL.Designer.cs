@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoodTrackerAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260421082345_InitialCreatePostgreSQL")]
+    [Migration("20260421082822_InitialCreatePostgreSQL")]
     partial class InitialCreatePostgreSQL
     {
         /// <inheritdoc />
@@ -32,7 +32,7 @@ namespace MoodTrackerAPI.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Mood")
                         .IsRequired()
