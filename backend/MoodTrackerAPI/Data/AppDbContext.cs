@@ -12,5 +12,15 @@ namespace MoodTrackerAPI.Data
         }
 
         public DbSet<MoodEntry> MoodEntries { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configure Date column to use timestamp with time zone (PostgreSQL best practice)
+            modelBuilder.Entity<MoodEntry>()
+                .Property(e => e.Date)
+                .HasColumnType("timestamp with time zone");
+        }
     }
 }
