@@ -33,6 +33,10 @@ jobs:
         working-directory: ./backend/MoodTrackerAPI
         run: dotnet build --configuration Release --no-restore
 
+      - name: Check code formatting
+        working-directory: ./backend/MoodTrackerAPI
+        run: dotnet format --verify-no-changes --verbosity diagnostic || echo "⚠️ Code formatting issues detected"
+
       - name: Run unit tests
         working-directory: ./backend/MoodTrackerAPI.Tests
         run: dotnet test --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" || true
