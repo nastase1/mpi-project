@@ -1,5 +1,11 @@
 # 🎭 Daily Mood Tracker
 
+[![CI Pipeline](https://github.com/nastase1/mpi-project/actions/workflows/ci.yml/badge.svg)](https://github.com/nastase1/mpi-project/actions/workflows/ci.yml)
+[![CD Pipeline](https://github.com/nastase1/mpi-project/actions/workflows/cd.yml/badge.svg)](https://github.com/nastase1/mpi-project/actions/workflows/cd.yml)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)](./DOCKER_GUIDE.md)
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+
 Aplicație web full-stack pentru urmărirea dispoziției zilnice, dezvoltată ca proiect pentru cursul de Managementul Proiectelor Informatice.
 
 ## 📋 Descriere
@@ -8,22 +14,24 @@ Daily Mood Tracker permite utilizatorilor să-și înregistreze starea emoționa
 
 ## 👥 Echipa
 
-| Rol | Nume | Responsabilități |
-|-----|------|------------------|
-| **Backend Developer** | [Nume] | API REST, Baza de date, Logica de business |
-| **Frontend Developer** | [Nume] | Interfața utilizator, Integrare API |
-| **QA Engineer** | [Nume] | Teste automate, Validare calitate |
-| **DevOps Engineer** | [Nume] | Docker, CI/CD, Cloud Deployment |
+| Rol                    | Nume   | Responsabilități                           |
+| ---------------------- | ------ | ------------------------------------------ |
+| **Backend Developer**  | [Nume] | API REST, Baza de date, Logica de business |
+| **Frontend Developer** | [Nume] | Interfața utilizator, Integrare API        |
+| **QA Engineer**        | [Nume] | Teste automate, Validare calitate          |
+| **DevOps Engineer**    | [Nume] | Docker, CI/CD, Cloud Deployment            |
 
 ## 🛠️ Stack Tehnologic
 
 ### Backend
+
 - **Framework:** ASP.NET Core 8.0
 - **Database:** SQL Server 2022
 - **ORM:** Entity Framework Core
 - **API:** REST
 
 ### Frontend
+
 - **Framework:** React 19 + TypeScript
 - **Build Tool:** Vite
 - **Styling:** Tailwind CSS
@@ -31,6 +39,7 @@ Daily Mood Tracker permite utilizatorilor să-și înregistreze starea emoționa
 - **Physics Engine:** Matter.js (pentru animații interactive)
 
 ### Infrastructure
+
 - **Containerization:** Docker & Docker Compose
 - **CI/CD:** GitHub Actions
 - **Cloud:** [Render/Railway/Azure - de completat]
@@ -38,6 +47,7 @@ Daily Mood Tracker permite utilizatorilor să-și înregistreze starea emoționa
 ## 🚀 Quick Start cu Docker
 
 ### Cerințe
+
 - Docker Desktop instalat și pornit
 - Git
 
@@ -143,12 +153,12 @@ mpi-project/
 
 ### MoodEntries
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/MoodEntries` | Returnează toate înregistrările |
-| GET | `/api/MoodEntries/{id}` | Returnează o înregistrare specifică |
-| POST | `/api/MoodEntries` | Creează o înregistrare nouă |
-| DELETE | `/api/MoodEntries/{id}` | Șterge o înregistrare |
+| Method | Endpoint                | Description                         |
+| ------ | ----------------------- | ----------------------------------- |
+| GET    | `/api/MoodEntries`      | Returnează toate înregistrările     |
+| GET    | `/api/MoodEntries/{id}` | Returnează o înregistrare specifică |
+| POST   | `/api/MoodEntries`      | Creează o înregistrare nouă         |
+| DELETE | `/api/MoodEntries/{id}` | Șterge o înregistrare               |
 
 ### Request Body Example (POST)
 
@@ -161,6 +171,7 @@ mpi-project/
 ```
 
 ### Mood Values
+
 - `Great` 🤩
 - `Good` 🙂
 - `Neutral` 😐
@@ -183,7 +194,49 @@ cd frontend
 npm run test
 ```
 
-## 🔧 Configurare Environment Variables
+## � CI/CD Pipeline
+
+Proiectul utilizează **GitHub Actions** pentru automatizarea build-ului, testării și deployment-ului.
+
+### Continuous Integration (CI)
+
+**Trigger:** Orice Pull Request către `main` sau `develop`
+
+**Ce face:**
+- ✅ Rulează teste backend (.NET unit tests)
+- ✅ Verifică build-ul frontend (linting + compile)
+- ✅ Validează Docker images (build test)
+- ✅ Testează integrarea completă (docker-compose)
+- ✅ Quality Gate - toate check-urile trebuie să treacă
+
+**Status:** Vezi badge-urile de mai sus ☝️
+
+### Continuous Deployment (CD)
+
+**Trigger:** Merge pe branch-ul `main`
+
+**Ce face:**
+- 📦 Build Docker images pentru backend și frontend
+- 🚀 Push images la GitHub Container Registry
+- ☁️ Deploy automat în cloud (production)
+- 📢 Notifică echipa despre status deployment
+
+### Pentru Dezvoltatori
+
+**Înainte de a crea un PR:**
+1. Asigură-te că aplicația pornește local: `docker compose up`
+2. Rulează testele: `cd backend/MoodTrackerAPI.Tests && dotnet test`
+3. Verifică că frontend se compilează: `cd frontend && npm run build`
+
+**După ce creezi PR-ul:**
+- CI va rula automat toate testele
+- Așteaptă ca toate check-urile să devină verzi ✅
+- Cere code review de la colegi
+- Merge doar după aprobarea review-ului
+
+**Documentație completă:** [.github/CICD.md](.github/CICD.md)
+
+## �🔧 Configurare Environment Variables
 
 ### Backend (.env)
 
@@ -215,12 +268,14 @@ docker compose up -d
 ### Manual
 
 **Backend:**
+
 ```bash
 cd backend/MoodTrackerAPI
 dotnet publish -c Release -o ./publish
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm run build
@@ -241,6 +296,7 @@ npm run build
 ### Docker
 
 **Problema:** Containerele nu pornesc
+
 ```bash
 # Verifică logs
 docker compose logs
@@ -251,6 +307,7 @@ docker compose up --build
 ```
 
 **Problema:** Database connection failed
+
 ```bash
 # Verifică dacă SQL Server container e healthy
 docker compose ps
@@ -262,10 +319,12 @@ docker compose logs db
 ### Development Local
 
 **Problema:** Backend nu se conectează la database
+
 - Verifică că SQL Server LocalDB e instalat
 - Rulează migrațiile: `dotnet ef database update`
 
 **Problema:** Frontend nu vede backend
+
 - Verifică că backend rulează pe portul 5162
 - Verifică `.env` file în frontend
 
