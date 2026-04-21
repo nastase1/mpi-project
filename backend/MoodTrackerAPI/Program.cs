@@ -21,7 +21,9 @@ namespace MoodTrackerAPI
             if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
             {
                 var uri = new Uri(connectionString);
-                connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true";
+                var port = uri.Port > 0 ? uri.Port : 5432; // Default PostgreSQL port
+                var userInfo = uri.UserInfo.Split(':');
+                connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
                 Console.WriteLine("Converted DATABASE_URL from postgres:// format to Npgsql format");
             }
             
