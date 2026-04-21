@@ -17,6 +17,14 @@ namespace MoodTrackerAPI
             var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
                 ?? builder.Configuration.GetConnectionString("DefaultConnection");
             
+            // Convert Render's PostgreSQL URL format to Npgsql connection string format
+            if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
+            {
+                var uri = new Uri(connectionString);
+                connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true";
+                Console.WriteLine("Converted DATABASE_URL from postgres:// format to Npgsql format");
+            }
+            
             // Debug: Log connection string status (without exposing password)
             if (string.IsNullOrEmpty(connectionString))
             {
