@@ -16,7 +16,7 @@ namespace MoodTrackerAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Mood = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Note = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
                 },

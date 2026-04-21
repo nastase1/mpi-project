@@ -17,10 +17,10 @@ namespace MoodTrackerAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure Date column to use timestamp without time zone
+            // Configure Date column to use timestamp with time zone (PostgreSQL best practice)
             modelBuilder.Entity<MoodEntry>()
                 .Property(e => e.Date)
-                .HasColumnType("timestamp without time zone");
+                .HasColumnType("timestamp with time zone");
         }
     }
 }
