@@ -224,7 +224,7 @@ export default function MoodJar() {
       {draftMood && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setDraftMood(null)}></div>
-          <div className="bg-white/95 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl z-10 w-full max-w-sm border border-white flex flex-col gap-5 animate-pop-in relative overflow-hidden">
+          <div data-testid="add-mood-modal" className="bg-white/95 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl z-10 w-full max-w-sm border border-white flex flex-col gap-5 animate-pop-in relative overflow-hidden">
              
              {/* Glow decorativ modal */}
              <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 blur-[40px] rounded-full pointer-events-none" />
@@ -239,8 +239,9 @@ export default function MoodJar() {
              </div>
 
              <div className="relative z-10">
-               <textarea 
+               <textarea
                  autoFocus
+                 data-testid="note-textarea"
                  className="w-full p-5 rounded-2xl bg-white border border-slate-100 shadow-inner focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none min-h-[120px] text-slate-700 text-lg transition-all resize-none placeholder:text-slate-300"
                  placeholder="Scrie o notiță aici..."
                  value={draftNote}
@@ -249,8 +250,8 @@ export default function MoodJar() {
              </div>
 
              <div className="flex gap-3 mt-2 relative z-10">
-               <button onClick={() => setDraftMood(null)} className="flex-1 py-4 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold transition-colors active:scale-95">Anulează</button>
-               <button onClick={handleSaveMood} disabled={isSaving} className="flex-[2] py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-500 text-white font-bold shadow-lg shadow-indigo-200 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 transition-all">
+               <button data-testid="cancel-mood-btn" onClick={() => setDraftMood(null)} className="flex-1 py-4 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold transition-colors active:scale-95">Anulează</button>
+               <button data-testid="save-mood-btn" onClick={handleSaveMood} disabled={isSaving} className="flex-[2] py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-500 text-white font-bold shadow-lg shadow-indigo-200 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 transition-all">
                  {isSaving ? "Se salvează..." : "Adaugă în Borcan"}
                </button>
              </div>
@@ -326,6 +327,7 @@ export default function MoodJar() {
         {(Object.keys(MOODS) as MoodType[]).map((moodKey) => (
           <button
             key={moodKey}
+            data-testid={`mood-btn-${moodKey}`}
             onClick={() => {
               const dynamicBodies = Matter.Composite.allBodies(engineRef.current.world).filter(b => !b.isStatic);
               if (dynamicBodies.length > 0 && Math.min(...dynamicBodies.map(b => b.position.y)) < 80) {
