@@ -37,14 +37,14 @@ Daily Mood Tracker este o aplicație web full-stack de tip **Premium Interactive
 
 ### ✨ Caracteristici Principale
 
-| Feature | Descriere | Tehnologie |
-|---------|-----------|------------|
-| **🫙 Mood Jar Interactiv** | Reprezentare dinamică a stărilor emoționale ca sfere fizice cu masă, fricțiune și elasticitate personalizate. Utilizatorii pot trage, arunca și interacționa cu emoțiile lor. | **Matter.js** (2D Physics Engine) + Audio feedback |
-| **🎨 Spatial UI Design** | Interfață inspirată din VisionOS/macOS cu straturi translucide, umbre soft și gradient-uri mesh ambientale. | **Tailwind CSS** (glassmorphism, backdrop-blur) |
-| **📅 History Heatmap** | Calendar grid inteligent care calculează și vizualizează dispoziția dominantă pentru fiecare zi. | Click pentru detalii, filtrare pe tip de mood |
-| **🧭 Floating Navbar** | Bară de navigație centrală în stil "pill" care se adaptează perfect la toate viewport-urile. | Micro-interacțiuni responsive |
-| **⚡ Real-time CRUD** | Management complet al intrărilor emoționale (Creare, Citire, Ștergere). | Sincronizare instant între physics engine, UI și PostgreSQL |
-| **🔄 Auto-migration** | Baza de date se creează/actualizează automat la pornire. | Entity Framework Core Migrations |
+| Feature                    | Descriere                                                                                                                                                                     | Tehnologie                                                  |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **🫙 Mood Jar Interactiv** | Reprezentare dinamică a stărilor emoționale ca sfere fizice cu masă, fricțiune și elasticitate personalizate. Utilizatorii pot trage, arunca și interacționa cu emoțiile lor. | **Matter.js** (2D Physics Engine) + Audio feedback          |
+| **🎨 Spatial UI Design**   | Interfață inspirată din VisionOS/macOS cu straturi translucide, umbre soft și gradient-uri mesh ambientale.                                                                   | **Tailwind CSS** (glassmorphism, backdrop-blur)             |
+| **📅 History Heatmap**     | Calendar grid inteligent care calculează și vizualizează dispoziția dominantă pentru fiecare zi.                                                                              | Click pentru detalii, filtrare pe tip de mood               |
+| **🧭 Floating Navbar**     | Bară de navigație centrală în stil "pill" care se adaptează perfect la toate viewport-urile.                                                                                  | Micro-interacțiuni responsive                               |
+| **⚡ Real-time CRUD**      | Management complet al intrărilor emoționale (Creare, Citire, Ștergere).                                                                                                       | Sincronizare instant între physics engine, UI și PostgreSQL |
+| **🔄 Auto-migration**      | Baza de date se creează/actualizează automat la pornire.                                                                                                                      | Entity Framework Core Migrations                            |
 
 ## 👥 Echipa
 
@@ -59,37 +59,37 @@ Daily Mood Tracker este o aplicație web full-stack de tip **Premium Interactive
 
 ### Backend
 
-| Categorie | Tehnologie | Scop în Proiect |
-|-----------|-----------|----------------|
-| **Framework** | **ASP.NET Core 8.0** | Web API, Dependency Injection, Middleware pipeline |
-| **Database** | **PostgreSQL 16** | Relational database cu suport pentru timestamp with time zone |
-| **ORM** | **Entity Framework Core** | Database migrations, LINQ queries, SQL injection protection |
-| **API** | **REST** | Stateless communication, JSON payloads, HTTP status codes |
-| **Authentication** | **CORS** | Cross-Origin Resource Sharing pentru frontend |
-| **Logging** | **ILogger<T>** | Structured logging cu log levels (Info, Warning, Error) |
-| **Validation** | **Data Annotations** | Model validation, error handling |
+| Categorie          | Tehnologie                | Scop în Proiect                                               |
+| ------------------ | ------------------------- | ------------------------------------------------------------- |
+| **Framework**      | **ASP.NET Core 8.0**      | Web API, Dependency Injection, Middleware pipeline            |
+| **Database**       | **PostgreSQL 16**         | Relational database cu suport pentru timestamp with time zone |
+| **ORM**            | **Entity Framework Core** | Database migrations, LINQ queries, SQL injection protection   |
+| **API**            | **REST**                  | Stateless communication, JSON payloads, HTTP status codes     |
+| **Authentication** | **CORS**                  | Cross-Origin Resource Sharing pentru frontend                 |
+| **Logging**        | **ILogger<T>**            | Structured logging cu log levels (Info, Warning, Error)       |
+| **Validation**     | **Data Annotations**      | Model validation, error handling                              |
 
 ### Frontend
 
-| Categorie | Tehnologie | Scop în Proiect |
-|-----------|-----------|----------------|
-| **Framework** | **React 18** | Functional components, hooks (useState, useEffect, useRef) |
-| **Language** | **TypeScript** | Type safety, IntelliSense, compile-time error detection |
-| **Build Tool** | **Vite** | Fast HMR, optimized production builds, modern ES modules |
-| **Styling** | **Tailwind CSS** | Utility-first styling, glassmorphism effects, custom animations |
-| **Routing** | **React Router 6** | Client-side routing, protected routes, navigation state |
-| **Physics** | **Matter.js** | 2D rigid body physics engine pentru Mood Jar simulation |
-| **HTTP Client** | **Fetch API** | Asynchronous REST API communication cu backend |
+| Categorie       | Tehnologie         | Scop în Proiect                                                 |
+| --------------- | ------------------ | --------------------------------------------------------------- |
+| **Framework**   | **React 18**       | Functional components, hooks (useState, useEffect, useRef)      |
+| **Language**    | **TypeScript**     | Type safety, IntelliSense, compile-time error detection         |
+| **Build Tool**  | **Vite**           | Fast HMR, optimized production builds, modern ES modules        |
+| **Styling**     | **Tailwind CSS**   | Utility-first styling, glassmorphism effects, custom animations |
+| **Routing**     | **React Router 6** | Client-side routing, protected routes, navigation state         |
+| **Physics**     | **Matter.js**      | 2D rigid body physics engine pentru Mood Jar simulation         |
+| **HTTP Client** | **Fetch API**      | Asynchronous REST API communication cu backend                  |
 
 ### Infrastructure
 
-| Categorie | Tehnologie | Scop în Proiect |
-|-----------|-----------|----------------|
-| **Containerization** | **Docker & Docker Compose** | Multi-stage builds, health checks, named volumes, custom network |
-| **CI/CD** | **GitHub Actions** | Automated testing, linting, build validation, deployment |
-| **Cloud Platform** | **Render.com** | PostgreSQL managed database, Web Service (backend), Static Site (frontend) |
-| **Version Control** | **Git & GitHub** | Branch protection, PR workflow, code review, issue tracking |
-| **Monitoring** | **Render Metrics + ILogger** | CPU/Memory tracking, structured application logs, health checks |
+| Categorie            | Tehnologie                   | Scop în Proiect                                                            |
+| -------------------- | ---------------------------- | -------------------------------------------------------------------------- |
+| **Containerization** | **Docker & Docker Compose**  | Multi-stage builds, health checks, named volumes, custom network           |
+| **CI/CD**            | **GitHub Actions**           | Automated testing, linting, build validation, deployment                   |
+| **Cloud Platform**   | **Render.com**               | PostgreSQL managed database, Web Service (backend), Static Site (frontend) |
+| **Version Control**  | **Git & GitHub**             | Branch protection, PR workflow, code review, issue tracking                |
+| **Monitoring**       | **Render Metrics + ILogger** | CPU/Memory tracking, structured application logs, health checks            |
 
 ## 🚀 Quick Start cu Docker
 
@@ -179,16 +179,16 @@ npm run dev
 ```
 Controllers/          # HTTP Endpoints
     ├─ MoodEntriesController.cs  → Expune REST API, validare input, status codes
-    
+
 Services/            # Business Logic
     └─ MoodEntryService.cs       → CRUD operations, data transformation
-    
+
 Models/              # Data Entities
     └─ MoodEntry.cs              → Entity properties, data annotations
-    
+
 Data/                # Database Context
     └─ AppDbContext.cs           → EF Core configuration, DbSet<T>
-    
+
 Migrations/          # Database Schema
     └─ {timestamp}_*.cs          → Auto-generated schema changes
 ```
@@ -217,12 +217,12 @@ services:
   db:               # PostgreSQL 16 Alpine
     └─ Health: pg_isready
     └─ Volume: moodtracker-data (persistent)
-    
+
   backend:          # ASP.NET Core 8.0
     └─ Depends: db (health check)
     └─ Port: 5162 → 8080
     └─ Auto-migration on startup
-    
+
   frontend:         # React + Nginx
     └─ Build: Vite production
     └─ Port: 5173 → 80
@@ -292,12 +292,12 @@ mpi-project/
 
 ### MoodEntries Controller
 
-| Method | Endpoint | Descriere | Status Codes |
-|--------|----------|-----------|-------------|
-| GET | `/api/MoodEntries` | Returnează toate înregistrările (ordonate descrescător după dată) | 200 OK |
-| GET | `/api/MoodEntries/{id}` | Returnează o înregistrare specifică după ID (Guid) | 200 OK / 404 NotFound |
-| POST | `/api/MoodEntries` | Creează o înregistrare nouă | 201 Created / 400 BadRequest |
-| DELETE | `/api/MoodEntries/{id}` | Șterge o înregistrare după ID | 204 NoContent / 404 NotFound |
+| Method | Endpoint                | Descriere                                                         | Status Codes                 |
+| ------ | ----------------------- | ----------------------------------------------------------------- | ---------------------------- |
+| GET    | `/api/MoodEntries`      | Returnează toate înregistrările (ordonate descrescător după dată) | 200 OK                       |
+| GET    | `/api/MoodEntries/{id}` | Returnează o înregistrare specifică după ID (Guid)                | 200 OK / 404 NotFound        |
+| POST   | `/api/MoodEntries`      | Creează o înregistrare nouă                                       | 201 Created / 400 BadRequest |
+| DELETE | `/api/MoodEntries/{id}` | Șterge o înregistrare după ID                                     | 204 NoContent / 404 NotFound |
 
 ### Request Body Example (POST)
 
@@ -311,28 +311,29 @@ mpi-project/
 
 ### Mood Values (Case-Insensitive)
 
-| Value | Emoji | Descriere |
-|-------|-------|-----------|
-| `great` | 🤩 | Exceptional mood - peak happiness |
-| `good` | 🙂 | Positive mood - feeling content |
-| `neutral` | 😐 | Balanced mood - neither good nor bad |
-| `bad` | 😕 | Negative mood - feeling down |
-| `awful` | 😭 | Very negative mood - significant distress |
+| Value     | Emoji | Descriere                                 |
+| --------- | ----- | ----------------------------------------- |
+| `great`   | 🤩    | Exceptional mood - peak happiness         |
+| `good`    | 🙂    | Positive mood - feeling content           |
+| `neutral` | 😐    | Balanced mood - neither good nor bad      |
+| `bad`     | 😕    | Negative mood - feeling down              |
+| `awful`   | 😭    | Very negative mood - significant distress |
 
 ### Validări Backend
 
 Backend-ul aplică următoarele validări:
 
-| Câmp | Validare | Error Response |
-|------|----------|----------------|
-| **mood** | Required, trebuie să fie unul din: great/good/neutral/bad/awful | 400 BadRequest: "Invalid mood value" |
-| **date** | Required, nu poate fi în viitor | 400 BadRequest: "Date cannot be in the future" |
-| **note** | Optional, max 500 caractere | 400 BadRequest: "Note too long" |
-| **id** | Must be valid Guid format | 400 BadRequest: "Invalid ID format" |
+| Câmp     | Validare                                                        | Error Response                                 |
+| -------- | --------------------------------------------------------------- | ---------------------------------------------- |
+| **mood** | Required, trebuie să fie unul din: great/good/neutral/bad/awful | 400 BadRequest: "Invalid mood value"           |
+| **date** | Required, nu poate fi în viitor                                 | 400 BadRequest: "Date cannot be in the future" |
+| **note** | Optional, max 500 caractere                                     | 400 BadRequest: "Note too long"                |
+| **id**   | Must be valid Guid format                                       | 400 BadRequest: "Invalid ID format"            |
 
 **Protecție împotriva SQL Injection:** Toate query-urile folosesc EF Core parametrizat.
 
 **CORS Policy:** Backend permite request-uri doar de la:
+
 - `http://localhost:5173` (dev)
 - `http://localhost:3000` (alternative dev)
 - `https://moodtracker-frontend-jbfn.onrender.com` (production)
@@ -347,6 +348,7 @@ dotnet test --verbosity normal
 ```
 
 **Test Coverage:**
+
 - ✅ `GetAllMoodEntries_ReturnsAllEntries` - Verifică returnarea tuturor înregistrărilor
 - ✅ `GetMoodEntryById_ReturnsEntry_WhenExists` - Verifică returnarea după ID valid
 - ✅ `GetMoodEntryById_ReturnsNull_WhenNotFound` - Verifică comportament pentru ID inexistent
@@ -355,6 +357,7 @@ dotnet test --verbosity normal
 - ✅ `DeleteMoodEntry_ReturnsFalse_WhenNotFound` - Verifică comportament pentru ștergere ID inexistent
 
 **Arhitectură teste:**
+
 - Folosește `EF Core InMemory Database` pentru izolare
 - Setup/cleanup automat în fiecare test
 - Mock data pentru scenarii realiste
@@ -368,6 +371,7 @@ npm run test
 ```
 
 **Test suites:**
+
 - Component rendering tests
 - User interaction simulations
 - API integration mocks
@@ -719,34 +723,38 @@ git push origin feat/nume-feature
 
 ### Commit Message Convention
 
-| Type | Folosire | Exemple |
-|------|----------|---------|
-| `feat:` | New feature | `feat: add mood statistics chart` |
-| `fix:` | Bug fix | `fix: resolve timezone issue in date picker` |
-| `docs:` | Documentation | `docs: update API endpoint examples` |
-| `style:` | Formatting | `style: fix indentation in MoodJar.tsx` |
+| Type        | Folosire         | Exemple                                            |
+| ----------- | ---------------- | -------------------------------------------------- |
+| `feat:`     | New feature      | `feat: add mood statistics chart`                  |
+| `fix:`      | Bug fix          | `fix: resolve timezone issue in date picker`       |
+| `docs:`     | Documentation    | `docs: update API endpoint examples`               |
+| `style:`    | Formatting       | `style: fix indentation in MoodJar.tsx`            |
 | `refactor:` | Code restructure | `refactor: extract validation to separate service` |
-| `test:` | Add/update tests | `test: add unit tests for MoodEntryService` |
-| `chore:` | Maintenance | `chore: update dependencies` |
+| `test:`     | Add/update tests | `test: add unit tests for MoodEntryService`        |
+| `chore:`    | Maintenance      | `chore: update dependencies`                       |
 
 ### Pull Request Template
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Tested locally with `docker compose up`
 - [ ] All unit tests passing
 - [ ] CI pipeline successful
 
 ## Closes
+
 Closes #[issue_number]
 ```
 
@@ -770,11 +778,11 @@ Closes #[issue_number]
 
 ### Production URLs
 
-| Service | URL | Status |
-|---------|-----|--------|
-| **Frontend** | [moodtracker-frontend-jbfn.onrender.com](https://moodtracker-frontend-jbfn.onrender.com) | 🟢 Live |
-| **Backend API** | [moodtracker-backend-2fk4.onrender.com/api/MoodEntries](https://moodtracker-backend-2fk4.onrender.com/api/MoodEntries) | 🟢 Live |
-| **Database** | Internal PostgreSQL 16 | 🟢 Running |
+| Service         | URL                                                                                                                    | Status     |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **Frontend**    | [moodtracker-frontend-jbfn.onrender.com](https://moodtracker-frontend-jbfn.onrender.com)                               | 🟢 Live    |
+| **Backend API** | [moodtracker-backend-2fk4.onrender.com/api/MoodEntries](https://moodtracker-backend-2fk4.onrender.com/api/MoodEntries) | 🟢 Live    |
+| **Database**    | Internal PostgreSQL 16                                                                                                 | 🟢 Running |
 
 ### Deployment Process
 
@@ -788,6 +796,7 @@ Closes #[issue_number]
 6. Health checks verify services are responding
 
 **Manual (Render Dashboard):**
+
 ```bash
 # Trigger deploy: Settings → Deploy → "Deploy latest commit"
 # View logs:     Logs → Select Service → Real-time output
@@ -796,12 +805,12 @@ Closes #[issue_number]
 
 ### Performance Metrics
 
-| Metric | Current (Free Tier) | Target (Paid) |
-|--------|---------------------|---------------|
-| Cold Start | ~30s | <5s |
-| Response Time (P95) | <500ms | <200ms |
-| Uptime | 99.5% | 99.9% |
-| Database Connections | Max 20 | Pooled |
+| Metric               | Current (Free Tier) | Target (Paid) |
+| -------------------- | ------------------- | ------------- |
+| Cold Start           | ~30s                | <5s           |
+| Response Time (P95)  | <500ms              | <200ms        |
+| Uptime               | 99.5%               | 99.9%         |
+| Database Connections | Max 20              | Pooled        |
 
 ## 📚 Documentație Adițională
 
@@ -831,32 +840,32 @@ Closes #[issue_number]
 
 #### ✅ Nota de Echipă (4p) - Management & Proces
 
-| Criteriu | Status | Punctaj |
-|----------|--------|---------|
-| **1. Managementul Cerințelor** | ✅ Complete | 1.5p |
-| - Backlog cu 10+ User Stories | ✅ | |
-| - Format "As a user..." + Acceptance Criteria | ✅ | |
-| - Labels, Milestones, Estimates | ✅ | |
-| **2. Git Flow & Code Review** | ✅ Complete | 1.0p |
-| - Main branch protejat | ✅ | |
-| - Lucru pe branch-uri (feat/, fix/) | ✅ | |
-| - Pull Requests legate de Issues | ✅ | |
-| - Code Review între colegi | ✅ | |
-| **3. CI/CD & Infrastructure** | ✅ Complete | 1.0p |
-| - docker-compose.yml funcțional | ✅ | |
-| - GitHub Actions (teste + linting + deploy) | ✅ | |
-| - Deploy automat în Render.com | ✅ | |
-| **4. Documentație** | ✅ Complete | 0.5p |
-| - README complet (Setup, Arhitectură, Echipă) | ✅ | |
+| Criteriu                                      | Status      | Punctaj |
+| --------------------------------------------- | ----------- | ------- |
+| **1. Managementul Cerințelor**                | ✅ Complete | 1.5p    |
+| - Backlog cu 10+ User Stories                 | ✅          |         |
+| - Format "As a user..." + Acceptance Criteria | ✅          |         |
+| - Labels, Milestones, Estimates               | ✅          |         |
+| **2. Git Flow & Code Review**                 | ✅ Complete | 1.0p    |
+| - Main branch protejat                        | ✅          |         |
+| - Lucru pe branch-uri (feat/, fix/)           | ✅          |         |
+| - Pull Requests legate de Issues              | ✅          |         |
+| - Code Review între colegi                    | ✅          |         |
+| **3. CI/CD & Infrastructure**                 | ✅ Complete | 1.0p    |
+| - docker-compose.yml funcțional               | ✅          |         |
+| - GitHub Actions (teste + linting + deploy)   | ✅          |         |
+| - Deploy automat în Render.com                | ✅          |         |
+| **4. Documentație**                           | ✅ Complete | 0.5p    |
+| - README complet (Setup, Arhitectură, Echipă) | ✅          |         |
 
 #### ✅ Nota Individuală (1p) - Contribuție Tehnică
 
-| Rol | Membru | Livrabile | Status |
-|-----|--------|-----------|--------|
-| **Backend Developer** | Petcu Gabriela | API structure, Database design, Unit tests (5+) | ✅ |
-| **Frontend Developer** | Negoiță Andrei | UI implementation, API integration, Docker config | ✅ |
-| **QA Engineer** | Milica Andreea | Test scenarios, E2E/Integration tests, Bug reports | ✅ |
-| **DevOps Engineer** | Năstase Teodor | CI/CD pipeline, Cloud setup, Monitoring & Logging | ✅ |
+| Rol                    | Membru         | Livrabile                                          | Status |
+| ---------------------- | -------------- | -------------------------------------------------- | ------ |
+| **Backend Developer**  | Petcu Gabriela | API structure, Database design, Unit tests (5+)    | ✅     |
+| **Frontend Developer** | Negoiță Andrei | UI implementation, API integration, Docker config  | ✅     |
+| **QA Engineer**        | Milica Andreea | Test scenarios, E2E/Integration tests, Bug reports | ✅     |
+| **DevOps Engineer**    | Năstase Teodor | CI/CD pipeline, Cloud setup, Monitoring & Logging  | ✅     |
 
 ### Tehnologii Folosite (conform cerințelor)
 
@@ -871,7 +880,7 @@ Closes #[issue_number]
 
 ## 📄 Licență
 
-Acest proiect este dezvoltat în scop educațional pentru cursul **Managementul Proiectelor Informatice (MPI)** - Semestrul II, Anul Universitar 2025-2026, Facultatea de Automatică și Calculatoare, Universitatea Politehnica București.
+Acest proiect este dezvoltat în scop educațional pentru cursul **Managementul Proiectelor Informatice (MPI)** - Semestrul II, Anul Universitar 2025-2026, Facultatea de Matematică și Informatică, Universitatea Transilvania Brașov.
 
 **Coordonator:** Asist. Mrd. Cezar Constăndoiu
 
